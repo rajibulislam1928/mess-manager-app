@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <title>Mess Manager Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-glow: rgba(16, 185, 129, 0.4);
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-orange: #f59e0b;
+            --accent-blue: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        header {
+            padding: 24px 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .summary-container {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-box {
+            text-align: center;
+            flex: 1;
+        }
+
+        .summary-box:first-child {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .member-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent-blue));
+            border-radius: 4px 0 0 4px;
+        }
+
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .member-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .member-balance {
+            text-align: right;
+        }
+
+        .balance-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .balance-positive { color: #10b981; }
+        .balance-negative { color: #ef4444; }
+
+        .bazar-edit {
+            font-size: 14px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .bazar-edit:hover { color: #60a5fa; }
+
+        .meals-container {
+            display: flex;
+            gap: 12px;
+        }
+
+        .meal-control {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .meal-icon-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meal-icon.morning { color: var(--accent-orange); }
+        .meal-icon.night { color: var(--accent-blue); }
+
+        .meal-count {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .add-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .add-btn:active { background: var(--primary); }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-title { margin-bottom: 16px; font-size: 20px; }
+
+        .modal-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            margin-bottom: 24px;
+            outline: none;
+        }
+        
+        .modal-input:focus { border-color: var(--primary); }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mess Manager Pro</h1>
+        <div class="summary-container">
+            <div class="summary-box">
+                <div class="summary-label">Per Meal Rate</div>
+                <div class="summary-value" id="perMealRate">৳0.00</div>
+            </div>
+            <div class="summary-box">
+                <div class="summary-label">Total Bazar</div>
+                <div class="summary-value" id="totalBazar" style="color: #fff; text-shadow: none;">৳0</div>
+            </div>
+        </div>
+    </header>
+
+    <main id="membersList">
+        <!-- Members injected via JS -->
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal" id="modalContent">
+            <h3 class="modal-title" id="modalTitle">Update Bazar</h3>
+            <input type="number" class="modal-input" id="bazarInput" placeholder="Amount (৳)">
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-save" onclick="saveBazar()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial state or load from local storage
+        const defaultMembers = [
+            { id: 1, name: 'Rajibul', morning: 0, night: 0, bazar: 1500 },
+            { id: 2, name: 'Manoj da', morning: 0, night: 0, bazar: 2000 },
+            { id: 3, name: 'Rohan', morning: 0, night: 0, bazar: 500 },
+            { id: 4, name: 'Shakil', morning: 0, night: 0, bazar: 1000 }
+        ];
+
+        let members = JSON.parse(localStorage.getItem('messMembers')) || defaultMembers;
+        let activeEditId = null;
+
+        function saveData() {
+            localStorage.setItem('messMembers', JSON.stringify(members));
+            render();
+        }
+
+        function calculateStats() {
+            let totalBazar = 0;
+            let totalMeals = 0;
+
+            members.forEach(m => {
+                totalBazar += m.bazar;
+                totalMeals += (m.morning + m.night);
+            });
+
+            const perMealRate = totalMeals === 0 ? 0 : (totalBazar / totalMeals);
+            return { totalBazar, perMealRate };
+        }
+
+        function incrementMeal(id, type) {
+            const member = members.find(m => m.id === id);
+            if(member) {
+                member[type]++;
+                saveData();
+            }
+        }
+
+        function openModal(id) {
+            activeEditId = id;
+            const member = members.find(m => m.id === id);
+            document.getElementById('modalTitle').innerText = `Update Bazar for ${member.name}`;
+            document.getElementById('bazarInput').value = member.bazar;
+            
+            const overlay = document.getElementById('modal');
+            const content = document.getElementById('modalContent');
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                content.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal');
+            const content = document.getElementById('modalContent');
+            overlay.style.opacity = '0';
+            content.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                activeEditId = null;
+            }, 300);
+        }
+
+        function saveBazar() {
+            const val = parseFloat(document.getElementById('bazarInput').value);
+            if(!isNaN(val) && activeEditId !== null) {
+                const member = members.find(m => m.id === activeEditId);
+                member.bazar = val;
+                saveData();
+            }
+            closeModal();
+        }
+
+        function render() {
+            const stats = calculateStats();
+            document.getElementById('perMealRate').innerText = `৳${stats.perMealRate.toFixed(2)}`;
+            document.getElementById('totalBazar').innerText = `৳${stats.totalBazar.toFixed(0)}`;
+
+            const list = document.getElementById('membersList');
+            list.innerHTML = '';
+
+            members.forEach(member => {
+                const totalMeals = member.morning + member.night;
+                const individualCost = totalMeals * stats.perMealRate;
+                const balance = member.bazar - individualCost;
+                
+                const balanceClass = balance >= 0 ? 'balance-positive' : 'balance-negative';
+                const balancePrefix = balance >= 0 ? '+' : '';
+
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                card.innerHTML = `
+                    <div class="member-header">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-balance">
+                            <div class="balance-value ${balanceClass}">${balancePrefix}৳${balance.toFixed(2)}</div>
+                            <div class="bazar-edit" onclick="openModal(${member.id})">Bazar: ৳${member.bazar.toFixed(0)}</div>
+                        </div>
+                    </div>
+                    <div class="meals-container">
+                        <div class="meal-control">
+                            <div class="meal-icon-wrapper">
+                                <span class="meal-icon morning">☀️</span>
+                                <span class="meal-count">${member.morning}</span>
+                            </div>
+                            <button class="add-btn" onclick="incrementMeal(${member.id}, 'morning')">+</button>
+                        </div>
+                        <div class="meal-control">
+                            <div class="meal-icon-wrapper">
+                                <span class="meal-icon night">🌙</span>
+                                <span class="meal-count">${member.night}</span>
+                            </div>
+                            <button class="add-btn" onclick="incrementMeal(${member.id}, 'night')">+</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>
